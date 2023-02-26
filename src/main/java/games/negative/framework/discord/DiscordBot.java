@@ -127,6 +127,10 @@ public abstract class DiscordBot {
         commandMap.registerGlobalCommand(command.getName(), command);
     }
 
+    public void registerGlobalContextCommand(@NotNull ContextCommand command) {
+        commandMap.registerGlobalContextCommand(command);
+    }
+
     /**
      * Register a {@link SlashCommand} as a server command
      * @param key {@link Guild} ID
@@ -135,6 +139,10 @@ public abstract class DiscordBot {
      */
     public void registerServerCommand(@NotNull String key, @NotNull SlashCommand command) {
         commandMap.registerServerCommand(key, command.getName(), command);
+    }
+
+    public void registerServerContextCommand(@NotNull String key, @NotNull ContextCommand command) {
+        commandMap.registerServerContextCommand(key, command);
     }
 
     /**
@@ -147,7 +155,6 @@ public abstract class DiscordBot {
         // Global Commands
         Collection<SlashCommand> globalCommands = commandMap.getGlobalCommands();
         CommandListUpdateAction commands = jda.updateCommands();
-
 
         globalCommands.forEach(command -> {
             if (!command.getAliases().isEmpty()) {
@@ -235,7 +242,6 @@ public abstract class DiscordBot {
             });
 
             guildCommands.queue();
-
         });
 
 
@@ -251,6 +257,8 @@ public abstract class DiscordBot {
                 data.accept(command);
 
             commands.addCommands(command);
+
+            System.out.println("[Command Registry] Registered Global Context Command `" + command.getName());
         }
 
         commands.queue();
@@ -263,7 +271,6 @@ public abstract class DiscordBot {
 
             CommandListUpdateAction guildCommands = guild.updateCommands();
 
-
             String name = command.getName();
             Command.Type type = command.getType();
 
@@ -274,6 +281,9 @@ public abstract class DiscordBot {
 
             guildCommands.addCommands(commandData);
             guildCommands.queue();
+
+            System.out.println("[Command Registry] Registered Server Context Command `" + commandData.getName()
+                    + "` to Guild `" + guild.getName() + "`");
         });
     }
 
