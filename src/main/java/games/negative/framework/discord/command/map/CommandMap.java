@@ -1,11 +1,14 @@
 package games.negative.framework.discord.command.map;
 
+import com.google.common.collect.Multimap;
+import games.negative.framework.discord.command.ContextCommand;
 import games.negative.framework.discord.command.SlashCommand;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 public interface CommandMap {
 
@@ -32,4 +35,16 @@ public interface CommandMap {
 
     HashMap<String, Collection<SlashCommand>> getAllServerCommands();
 
+    void registerServerContextCommand(@NotNull String serverID, @NotNull ContextCommand command);
+
+    void registerGlobalContextCommand(@NotNull ContextCommand command);
+
+    @NotNull
+    Collection<ContextCommand> getGlobalContextCommands();
+
+    @NotNull
+    Collection<ContextCommand> getServerContextCommands(@NotNull String serverID);
+
+    @NotNull
+    Multimap<String, ContextCommand> getAllServerContextCommands();
 }
