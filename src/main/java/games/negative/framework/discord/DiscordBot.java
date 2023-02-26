@@ -3,6 +3,7 @@ package games.negative.framework.discord;
 import games.negative.framework.discord.button.DiscordButtonListener;
 import games.negative.framework.discord.button.DiscordButtonRegistry;
 import games.negative.framework.discord.button.provider.DiscordButtonRegistryProvider;
+import games.negative.framework.discord.command.ContextCommand;
 import games.negative.framework.discord.command.SlashCommand;
 import games.negative.framework.discord.command.SlashSubCommand;
 import games.negative.framework.discord.command.listener.SlashCommandListener;
@@ -22,6 +23,9 @@ import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -31,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 @Getter
 public abstract class DiscordBot {
@@ -143,6 +148,7 @@ public abstract class DiscordBot {
         Collection<SlashCommand> globalCommands = commandMap.getGlobalCommands();
         CommandListUpdateAction commands = jda.updateCommands();
 
+
         globalCommands.forEach(command -> {
             if (!command.getAliases().isEmpty()) {
                 command.getAliases().forEach(name -> {
@@ -234,6 +240,16 @@ public abstract class DiscordBot {
 
         });
 
+
+        // Global Context Commands (NEW!)
+        Collection<ContextCommand> globalContext = commandMap.getGlobalContextCommands();
+        for (ContextCommand cmd : globalContext) {
+            String name = cmd.getName();
+            Command.Type type = cmd.getType();
+
+            CommandData command = Commands.context(type, name);
+            Consumer<CommandData> data = cmd.getData();
+        }
     }
 
 
