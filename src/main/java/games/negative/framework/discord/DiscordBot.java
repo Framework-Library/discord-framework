@@ -185,8 +185,6 @@ public abstract class DiscordBot {
             commands.addCommands(commandData);
         });
 
-        commands.queue();
-
         // Server Bound Commands
         commandMap.getAllServerCommands().entrySet().stream().filter(serverEntry -> jda.getGuildById(serverEntry.getKey()) != null).forEach(serverEntry -> {
             Guild guild = jda.getGuildById(serverEntry.getKey());
@@ -249,7 +247,34 @@ public abstract class DiscordBot {
 
             CommandData command = Commands.context(type, name);
             Consumer<CommandData> data = cmd.getData();
+            if (data != null)
+                data.accept(command);
+
+            commands.addCommands(command);
         }
+
+        commands.queue();
+
+        // Server Bound Context Commands (NEW!)
+        commandMap.getAllServerContextCommands().forEach((key, command) -> {
+            Guild guild = jda.getGuildById(key);
+            if (guild == null)
+                return;
+
+            CommandListUpdateAction guildCommands = guild.updateCommands();
+
+
+            String name = command.getName();
+            Command.Type type = command.getType();
+
+            CommandData commandData = Commands.context(type, name);
+            Consumer<CommandData> data = command.getData();
+            if (data != null)
+                data.accept(commandData);
+
+            guildCommands.addCommands(commandData);
+            guildCommands.queue();
+        });
     }
 
 
