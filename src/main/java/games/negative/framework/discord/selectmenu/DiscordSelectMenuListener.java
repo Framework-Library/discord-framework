@@ -5,8 +5,13 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class DiscordSelectMenuListener extends ListenerAdapter {
 
@@ -37,7 +42,13 @@ public class DiscordSelectMenuListener extends ListenerAdapter {
         if (!(selectMenu instanceof DiscordStringSelectMenu stringMenu))
             return;
 
-        stringMenu.getEvent().accept(menu, event);
+        Map<SelectOption, Consumer<StringSelectInteractionEvent>> options = stringMenu.getSelectOptions();
+        List<SelectOption> selected = event.getSelectedOptions();
+
+        for (SelectOption option : selected) {
+            Consumer<StringSelectInteractionEvent> consumer = options.get(option);
+            if (consumer != null) consumer.accept(event);
+        }
     }
 
     @Override
